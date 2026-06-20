@@ -14,7 +14,7 @@ The application uses JUnit 5, Mockito, and Spring Boot Test for automated testin
    - Tests saving, retrieving, and deleting entities from the database to ensure JPA mappings and constraints work at the DB level.
 
 3. **Controller Tests (`StaffRatingControllerTest`)**
-   - Uses `@SpringBootTest` combined with `MockMvc` (via `MockMvcBuilders.webAppContextSetup(context)`) to test the HTTP layer.
+   - Uses `@WebMvcTest` + `@MockitoBean` (the Spring Boot 3.4+ standard replacement for `@MockBean`) to test the HTTP layer via `MockMvc`.
    - Verifies that `GET` requests return `200 OK` and render the correct Thymeleaf views.
    - Verifies that successful `POST` submissions return `3xx Redirection`.
    - Verifies that validation failures on `POST` requests return `200 OK` and render the form with errors.

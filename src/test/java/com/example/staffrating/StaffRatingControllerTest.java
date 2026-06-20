@@ -4,36 +4,33 @@ import com.example.staffrating.controller.StaffRatingController;
 import com.example.staffrating.model.RoleType;
 import com.example.staffrating.model.StaffRating;
 import com.example.staffrating.service.StaffRatingService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Collections;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(StaffRatingController.class)
 public class StaffRatingControllerTest {
 
     @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private StaffRatingService service;
-
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-    }
+    @MockitoBean
+    private StaffRatingService service;
 
     @Test
     public void testGetIndex() throws Exception {
+        when(service.findAll()).thenReturn(Collections.emptyList());
+
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"))
@@ -42,6 +39,8 @@ public class StaffRatingControllerTest {
 
     @Test
     public void testPostCreateSuccess() throws Exception {
+        when(service.emailExists(any())).thenReturn(false);
+
         mockMvc.perform(post("/ratings")
                 .param("name", "John")
                 .param("email", "john.unique.test" + System.currentTimeMillis() + "@example.com")
