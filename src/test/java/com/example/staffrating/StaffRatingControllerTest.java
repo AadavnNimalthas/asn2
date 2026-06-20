@@ -4,76 +4,65 @@ import com.example.staffrating.controller.StaffRatingController;
 import com.example.staffrating.model.RoleType;
 import com.example.staffrating.model.StaffRating;
 import com.example.staffrating.service.StaffRatingService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 public class StaffRatingControllerTest {
 
     @Autowired
-    private StaffRatingController controller;
+    private WebApplicationContext context;
 
     @Autowired
     private StaffRatingService service;
 
-    @Test
-    public void testGetIndex() {
-        Model model = new ExtendedModelMap();
-        String viewName = controller.index(model);
-        assertEquals("index", viewName);
-        assertTrue(model.containsAttribute("ratings"));
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
     @Test
-    public void testPostCreateSuccess() {
-        StaffRating rating = new StaffRating();
-        rating.setName("John");
-        rating.setEmail("newtest@example.com");
-        rating.setRoleType(RoleType.TA);
-        rating.setClarity(8);
-        rating.setNiceness(9);
-        rating.setKnowledgeableScore(10);
-        rating.setComment("Great!");
-
-        BindingResult result = new BeanPropertyBindingResult(rating, "staffRating");
-        Model model = new ExtendedModelMap();
-        
-        String viewName = controller.createRating(rating, result, model);
-        assertEquals("redirect:/", viewName);
+    public void testGetIndex() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attributeExists("ratings"));
     }
 
     @Test
-    public void testPostCreateFailureEmailExists() {
-        StaffRating rating1 = new StaffRating();
-        rating1.setName("Alice");
-        rating1.setEmail("conflict@example.com");
-        rating1.setRoleType(RoleType.TA);
-        rating1.setClarity(8);
-        rating1.setNiceness(9);
-        rating1.setKnowledgeableScore(10);
-        service.save(rating1);
+    public void testPostCreateSuccess() throws Exception {
+        mockMvc.perform(post("/ratings")
+                .param("name", "John")
+                .param("email", "john.unique.test" + System.currentTimeMillis() + "@example.com")
+                .param("roleType", "TA")
+                .param("clarity", "8")
+                .param("niceness", "9")
+                .param("knowledgeableScore", "10")
+                .param("comment", "Great!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
 
-        StaffRating rating2 = new StaffRating();
-        rating2.setName("Bob");
-        rating2.setEmail("conflict@example.com");
-        rating2.setRoleType(RoleType.TA);
-        rating2.setClarity(8);
-        rating2.setNiceness(9);
-        rating2.setKnowledgeableScore(10);
-
-        BindingResult result = new BeanPropertyBindingResult(rating2, "staffRating");
-        Model model = new ExtendedModelMap();
-        
-        String viewName = controller.createRating(rating2, result, model);
-        assertEquals("create", viewName);
-        assertTrue(result.hasErrors());
+    @Test
+    public void testPostCreateFailure() throws Exception {
+        // Missing name, invalid email, etc.
+        mockMvc.perform(post("/ratings")
+                .param("email", "invalid")
+                .param("roleType", "TA")
+                .param("clarity", "15")) // clarity > 10
+                .andExpect(status().isOk())
+                .andExpect(view().name("create"))
+                .andExpect(model().hasErrors());
     }
 }

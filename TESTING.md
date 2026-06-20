@@ -9,14 +9,15 @@ The application uses JUnit 5, Mockito, and Spring Boot Test for automated testin
    - Verifies invalid emails, missing required names, scores outside the 1-10 range, and overly long comments.
 
 2. **Repository Tests (`StaffRatingRepositoryTest`)**
-   - Uses `@DataJpaTest` with an in-memory H2 database.
+   - Uses `@SpringBootTest` with an in-memory H2 database.
+   - Test configuration is safely isolated via `src/test/resources/application.properties` to ensure tests run locally using H2 without relying on PostgreSQL or external environment variables.
    - Tests saving, retrieving, and deleting entities from the database to ensure JPA mappings and constraints work at the DB level.
 
 3. **Controller Tests (`StaffRatingControllerTest`)**
-   - Uses `@WebMvcTest` to test the web layer in isolation without starting the full server.
-   - Mocks the `StaffRatingService` using `@MockBean`.
-   - Tests `GET` endpoints for rendering the correct Thymeleaf views.
-   - Tests `POST` endpoints for successful form submissions (redirections) and validation failures (returning to the form with errors).
+   - Uses `@SpringBootTest` combined with `MockMvc` (via `MockMvcBuilders.webAppContextSetup(context)`) to test the HTTP layer.
+   - Verifies that `GET` requests return `200 OK` and render the correct Thymeleaf views.
+   - Verifies that successful `POST` submissions return `3xx Redirection`.
+   - Verifies that validation failures on `POST` requests return `200 OK` and render the form with errors.
 
 ## How to Run Tests
 

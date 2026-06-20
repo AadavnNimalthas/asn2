@@ -74,6 +74,7 @@ public class StaffRatingController {
                 result.rejectValue("email", "error.staffRating", "Email already exists.");
             }
             if (result.hasErrors()) {
+                staffRating.setId(id);
                 return "edit";
             }
             existing.setName(staffRating.getName());
