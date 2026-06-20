@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Rating Details')}"></head>
+<body>
+    <nav th:replace="~{fragments :: nav}"></nav>
+    <div class="container">
+        <div class="card">
+            <!-- Using displayTitle() polymorphism here as requested -->
+            <h1 class="page-title" th:text="${rating.displayTitle}">Profile Title</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;" th:text="${rating.email}">email@example.com</p>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Overall Score</div>
+                    <div class="detail-value">
+                        <span class="score-badge" style="font-size: 1.5rem; padding: 0.5rem 1rem;" th:text="${rating.overallScore}">10</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Clarity</div>
+                    <div class="detail-value" th:text="${rating.clarity} + '/10'">10/10</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Niceness</div>
+                    <div class="detail-value" th:text="${rating.niceness} + '/10'">10/10</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Knowledge</div>
+                    <div class="detail-value" th:text="${rating.knowledgeableScore} + '/10'">10/10</div>
+                </div>
+            </div>
+            
+            <div class="detail-item" style="grid-column: 1 / -1; margin-bottom: 2rem;" th:if="${!#strings.isEmpty(rating.comment)}">
+                <div class="detail-label">Comment</div>
+                <div style="line-height: 1.6;" th:text="${rating.comment}">Comment text here</div>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                Added on <span th:text="${#temporals.format(rating.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                <span th:if="${rating.updatedAt != null and rating.createdAt != rating.updatedAt}">
+                    (Updated <span th:text="${#temporals.format(rating.updatedAt, 'MMM dd, yyyy HH:mm')}">Date</span>)
+                </span>
+            </p>
+            
+            <div class="actions">
+                <a th:href="@{/ratings/{id}/edit(id=${rating.id})}" class="btn btn-primary">Edit</a>
+                <form th:action="@{/ratings/{id}/delete(id=${rating.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this rating? This action cannot be undone.');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+                <a th:href="@{/}" class="btn btn-secondary" style="margin-left: auto;">Back to List</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

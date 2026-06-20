@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('All Ratings')}"></head>
+<body>
+    <nav th:replace="~{fragments :: nav}"></nav>
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h1 class="page-title" style="margin-bottom: 0;">Teaching Staff Ratings</h1>
+                <a th:href="@{/ratings/new}" class="btn btn-primary">+ New Rating</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Overall Score</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rating : ${ratings}">
+                            <td th:text="${rating.name}">Name</td>
+                            <td th:text="${rating.roleType}">Role</td>
+                            <td><span class="score-badge" th:text="${rating.overallScore}">10</span></td>
+                            <td th:text="${#temporals.format(rating.createdAt, 'MMM dd, yyyy')}">Date</td>
+                            <td>
+                                <a th:href="@{/ratings/{id}(id=${rating.id})}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.875rem;">View</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ratings)}">
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No ratings found. Be the first to add one!</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

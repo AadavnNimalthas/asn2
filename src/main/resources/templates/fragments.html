@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Rate CS Teaching Staff'">Rate CS Teaching Staff</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav th:fragment="nav" class="navbar">
+        <a th:href="@{/}" class="navbar-brand">Rate CS Staff</a>
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/ratings/new}">Add Rating</a>
+        </div>
+    </nav>
+</body>
+</html>
