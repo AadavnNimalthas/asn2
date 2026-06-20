@@ -64,4 +64,31 @@ public class StaffRatingControllerTest {
                 .andExpect(view().name("create"))
                 .andExpect(model().hasErrors());
     }
+
+    @Test
+    public void testPostUpdateSuccess() throws Exception {
+        StaffRating existing = new StaffRating();
+        existing.setId(1L);
+        existing.setEmail("old@example.com");
+        when(service.findById(1L)).thenReturn(java.util.Optional.of(existing));
+        when(service.emailExists(any())).thenReturn(false);
+
+        mockMvc.perform(post("/ratings/1")
+                .param("name", "John Updated")
+                .param("email", "john.updated@example.com")
+                .param("roleType", "TA")
+                .param("clarity", "9")
+                .param("niceness", "9")
+                .param("knowledgeableScore", "10")
+                .param("comment", "Updated!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/ratings/1"));
+    }
+
+    @Test
+    public void testPostDeleteSuccess() throws Exception {
+        mockMvc.perform(post("/ratings/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
 }
